@@ -1,10 +1,6 @@
-# Deploy Immutables Azure
+# Jetbrains Installer
 
-This IaC component permit parallel deployment of immutable resources on azure cloud.
-
-This is atomic routine for any CI/CD such as gitlab-ci, bitbucket-pipelines etc.
-In any case is possible to use it manually with run.sh helper script.
-
+A fantastic tool to install your favorite IDEs on Linux.
 
 ## Setup Development Environment
 
