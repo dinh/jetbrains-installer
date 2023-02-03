@@ -14,25 +14,25 @@ USER_HOME = os.getenv('HOME')
 
 # Download file helper
 # This helper download a file using filename and default params such as location and version. - return boolean
-def download_file(filename, location = USER_HOME + '/Downloads', version = 'nd', protocol = 'https://', fqdn = 'download.jetbrains.com', uri = '/webide/', extension = '.tar.gz'):
+def download_file(filename, location=f'{USER_HOME}/Downloads', version = 'nd', protocol = 'https://', fqdn = 'download.jetbrains.com', uri = '/webide/', extension = '.tar.gz'):
 
     if (version == 'nd'):
         full_filename = filename + extension
     else:
         full_filename = filename + version + extension
 
-    print('Selected file: ' + full_filename)
+    print(f'Selected file: {full_filename}')
 
     url = protocol + fqdn + uri + full_filename
 
-    print('File is located: ' + url)
+    print(f'File is located: {url}')
     print()
 
     try:
         print('Downloading...')
         response = requests.get(url)
         if (response.status_code != 200):
-            print("Invalid request: " + str(response.status_code))
+            print(f"Invalid request: {str(response.status_code)}")
             return False
 
         with open(location + full_filename, 'wb') as f:
@@ -42,13 +42,13 @@ def download_file(filename, location = USER_HOME + '/Downloads', version = 'nd',
         return True
 
     except Exception as e:
-        print("Error during download file" + str(e))
+        print(f"Error during download file{str(e)}")
         return False
 
 
 # Extract file helper
 # This helper extract a file using filename and default params such as location and version. - return boolean
-def extract_file(filename, location = USER_HOME + '/Downloads', version = 'nd', extension = '.tar.gz'):
+def extract_file(filename, location=f'{USER_HOME}/Downloads', version = 'nd', extension = '.tar.gz'):
 
     if (extension != '.tar.gz'):
         print('Invalid extension')
@@ -59,39 +59,39 @@ def extract_file(filename, location = USER_HOME + '/Downloads', version = 'nd', 
         full_filename = filename + version + extension
 
     try:
-        print('Extracting ' + location + full_filename + ' ...')
+        print(f'Extracting {location}{full_filename} ...')
         with tarfile.open(location + full_filename) as tar:
             def is_within_directory(directory, target):
-                
+
                 abs_directory = os.path.abspath(directory)
                 abs_target = os.path.abspath(target)
-            
+
                 prefix = os.path.commonprefix([abs_directory, abs_target])
-                
+
                 return prefix == abs_directory
-            
+
             def safe_extract(tar, path=".", members=None, *, numeric_owner=False):
-            
+
                 for member in tar.getmembers():
                     member_path = os.path.join(path, member.name)
                     if not is_within_directory(path, member_path):
                         raise Exception("Attempted Path Traversal in Tar File")
-            
+
                 tar.extractall(path, members, numeric_owner=numeric_owner) 
-                
-            
+
+
             safe_extract(tar, path=location)
 
         print('Extraction completed\n')
         return True
 
     except Exception as e:
-        print("Error during extracting file" + str(e))
+        print(f"Error during extracting file{str(e)}")
         return False
 
 # Remove file helper
 # This helper remove a file using filename and default params such as location and version. - return boolean
-def remove_file(filename, location = USER_HOME + '/Downloads', version = 'nd', extension = '.tar.gz'):
+def remove_file(filename, location=f'{USER_HOME}/Downloads', version = 'nd', extension = '.tar.gz'):
 
     if (version == 'nd'):
         full_filename = filename + extension
@@ -101,18 +101,18 @@ def remove_file(filename, location = USER_HOME + '/Downloads', version = 'nd', e
     full_location = location + full_filename
 
     try:
-        print('Deleting ' + full_location + ' ...')
+        print(f'Deleting {full_location} ...')
         os.remove(full_location)
         print('Done\n')
         return True
 
     except Exception as e:
-        print("Error during deleting file" + str(e))
+        print(f"Error during deleting file{str(e)}")
         return False
 
 # Rename file helper
 # This helper rename a file using filename and default params such as location and version. - return boolean
-def rename_file(filename, new_filename, location = USER_HOME + '/Downloads'):
+def rename_file(filename, new_filename, location=f'{USER_HOME}/Downloads'):
 
 
     full_location = glob.glob(location + filename + '*')
@@ -121,13 +121,13 @@ def rename_file(filename, new_filename, location = USER_HOME + '/Downloads'):
     try:
         for f in full_location:
 
-            print('Moving ' + f + ' to ' + new_full_location + ' ...')
+            print(f'Moving {f} to {new_full_location} ...')
             os.rename(f, new_full_location)
             print('Done')
             return True
 
     except Exception as e:
-        print("Error during moving file" + str(e))
+        print(f"Error during moving file{str(e)}")
         return False
 
 # Link file helper
@@ -138,13 +138,13 @@ def link_file(source, destination):
 
     try:
         # for f in source:
-            print('Linking ' + source + ' to ' + destination + ' ...')
-            os.symlink(source, destination)
-            print('Done\n')
-            return True
+        print(f'Linking {source} to {destination} ...')
+        os.symlink(source, destination)
+        print('Done\n')
+        return True
 
     except Exception as e:
-        print("Error during linking file" + str(e))
+        print(f"Error during linking file{str(e)}")
         return False
 
 
@@ -154,8 +154,8 @@ def check_required_args(data, action):
     required_fields = fields['required']
 
     for k, field in required_fields.items():
-        if (field == None):
-            print('Required ' + k + ' argument not provided')
+        if field is None:
+            print(f'Required {k} argument not provided')
             sys.exit(1)
 
 def check_action(args):
@@ -167,18 +167,15 @@ def check_action(args):
         if (argument != None):
             action = 1
 
-            if (k == 'install'):
-                index = 0
-                actions[index] = action
-            if (k == 'remove'):
-                index = 1
-                actions[index] = action
-            if (k == 'upgrade'):
-                index = 2
-                actions[index] = action
-            # if (k == 'version'):
-            #     index = 3
-            #     actions[index] = action
+            if k == 'install':
+                actions[0] = action
+            elif k == 'remove':
+                actions[1] = action
+            elif k == 'upgrade':
+                actions[2] = action
+                    # if (k == 'version'):
+                    #     index = 3
+                    #     actions[index] = action
 
     return actions
 
@@ -218,12 +215,12 @@ def install(target, version, location = '/opt/'):
     }
 
     for product in jb_products:
-         if product == target:
-             download_file(jb_products[target], location, version)
-             extract_file(jb_products[target], location, version)
-             remove_file(jb_products[target], location, version)
-             link_file(check_jetbrains_build_version(location, jb_products[target]), location + target)
-             link_file(target + '/bin/'+ target +'.sh', '/usr/local/bin/' + target)
+        if product == target:
+            download_file(jb_products[target], location, version)
+            extract_file(jb_products[target], location, version)
+            remove_file(jb_products[target], location, version)
+            link_file(check_jetbrains_build_version(location, jb_products[target]), location + target)
+            link_file(f'{target}/bin/{target}.sh', f'/usr/local/bin/{target}')
 
 
 def upgrade():
